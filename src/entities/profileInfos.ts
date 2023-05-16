@@ -6,6 +6,7 @@ import {
     UpdateDateColumn,
     Column,
     OneToOne,
+    JoinColumn,
 } from 'typeorm'
 import User from './user'
 
@@ -17,15 +18,16 @@ class ProfileInfos {
     @Column({type:'text', nullable: true})
     description: string | null
 
-    @Column({type:'number', default: 0})
+    @Column({type:'integer', default: 0})
     numberFollowers: number
 
-    @Column({type:'number', default: 0})
+    @Column({type:'integer', default: 0})
     numberFollowing: number
 
-    @Column({type:'number', default: 0})
+    @Column({type:'integer', default: 0})
     numberPosts: number
 
+    @JoinColumn()
     @OneToOne(()=> User,user => user.id)
     user: User
 

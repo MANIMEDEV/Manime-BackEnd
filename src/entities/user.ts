@@ -8,8 +8,9 @@ import {
     UpdateDateColumn,
     BeforeInsert,
     BeforeUpdate,
-    OneToMany,
     OneToOne,
+    JoinColumn,
+    ManyToOne,
 } from 'typeorm'
 import Followers from './followers'
 import ProfileInfos from './profileInfos'
@@ -57,12 +58,6 @@ class User {
 
     @Column({ type: 'varchar', length: 120 })
     password: string
-    
-    @OneToOne(()=> ProfileInfos,profileInfos => profileInfos.id)
-    profileInfos: ProfileInfos
-
-    @OneToMany(()=> Followers, followers => followers.user)
-    followers: Followers[]
 
     @CreateDateColumn({ type: 'date' })
     createdAt: string
@@ -72,6 +67,14 @@ class User {
 
     @DeleteDateColumn({ type: 'date' })
     deletedAt: string
+
+    @JoinColumn()
+    @OneToOne(()=> ProfileInfos,profileInfos => profileInfos.id)
+    profileInfos: ProfileInfos
+
+    @ManyToOne(()=> Followers, followers => followers.userFollower.id)
+    followers: Followers[]
+
 
     @BeforeInsert()
     @BeforeUpdate()
