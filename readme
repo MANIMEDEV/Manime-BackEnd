@@ -1,0 +1,115 @@
+
+# Manime API
+
+API relacionada ao Projeto MANIME
+
+## Stack utilizada
+
+**Back-end:** Node, Express
+
+
+## Rodando localmente
+
+Clone o projeto
+
+```bash
+  git clone https://link-para-o-projeto
+```
+
+Entre no diretório do projeto
+
+```bash
+  cd my-project
+```
+
+Instale as dependências
+
+```bash
+  npm install
+```
+
+Inicie o servidor
+
+```bash
+  npm run start
+```
+
+
+## Rodando os testes
+
+Para rodar os testes, rode o seguinte comando
+
+```bash
+  npm run test
+```
+
+
+## Documentação
+
+[Documentação](https://link-da-documentação)
+
+
+## /users post
+```javascript
+//POST
+//SEND OBJ
+REQUEST EXEMPLE {
+    "fullName": "teste",
+    "nickname": "TesteNick",
+    "email": "teste@email.com",
+    "password": "string",
+    "phone":  null,
+    "profileImg": null,
+    "bannerImg":  null,
+    "admin": true
+}
+
+RESPONSE EXEMPLE {
+   {
+	"id": 1,
+	"fullName": "teste",
+	"nickname": "TesteNick",
+	"email": "teste@email.com",
+	"phone": null,
+	"profileImg": "",
+	"bannerImg": "",
+	"banned": false,
+	"suspended": false,
+	"suspendedTime": null,
+	"admin": true,
+	"verified": false,
+	"confirmed": false,
+	"profileInfos": {
+		"id": 1,
+		"description": null,
+		"numberFollowers": 0,
+		"numberFollowing": 0,
+		"numberPosts": 0,
+		"createdAt": "2023-05-17",
+		"updatedAt": "2023-05-17",
+		"deletedAt": null
+	},
+	"createdAt": "2023-05-17",
+	"updatedAt": "2023-05-17",
+	"deletedAt": null
+} 
+}
+```
+## /users:id GET
+
+
+## /login POST
+
+```javascript
+
+REQUEST EXEMPLE {
+
+}
+RESPONSE EXEMPLE {
+	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiaWQiOjEsImlhdCI6MTY4NDMzNTQwOSwic3ViIjoiMSJ9.dKJEzmcIs-akJC2ERJYx4K_d9uBoajuOvGE6QK6MrPk"
+}
+
+
+```
+
+

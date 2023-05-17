@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../errors";
 import { ZodError } from 'zod'
-const errorHandler = (err: Error,req: Request,res: Response,next: NextFunction) => {
+const errorHandler = (err: Error,_req: Request,res: Response,_next: NextFunction) => {
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({ message: err.message });
     }
