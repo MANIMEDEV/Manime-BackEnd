@@ -1,10 +1,11 @@
-import {  verify } from "jsonwebtoken";
+import { verify } from "jsonwebtoken";
 import AppError from "../../errors";
-
+import "express-async-errors";
 export const retrivieveUserService = async (authToken: string) => {
     if (!authToken) {
         throw new AppError('Missing authorization token', 401);
     }
+
 
     return verify(
         authToken,

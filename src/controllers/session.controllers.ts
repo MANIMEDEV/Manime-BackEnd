@@ -5,11 +5,9 @@ import { retrivieveUserService } from "../services/session/retrivieveUser.servic
 
 const createSessionController = async (req: Request, res: Response): Promise<Response> => {
 
-    const token: string = await createSessionService(req.body);
+    const response: Object = await createSessionService(req.body);
 
-
-
-    return res.status(201).json({ token: token });
+    return res.status(201).json(response);
 }
 
 const retrivieveUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
@@ -21,10 +19,15 @@ const retrivieveUserController = async (req: Request, res: Response, next: NextF
     }
     const [_bearer, token] = authorization.split(' ');
 
-    const decoded = retrivieveUserService(token);
+
+    const decoded = await retrivieveUserService(token);
+
+
+    
 
     res.locals.userAuth = decoded;
 
+    
     return next();
 }
 

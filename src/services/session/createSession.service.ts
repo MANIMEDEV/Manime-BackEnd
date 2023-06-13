@@ -5,8 +5,9 @@ import { AppDataSource } from "../../data-source";
 import User from "../../entities/user";
 import AppError from "../../errors";
 import { IuserLogin } from "../../interfaces/users.interfaces";
+import { userSchemaResponseLogin } from "../../schemas/user.schemas";
 
-export const createSessionService = async (payload:IuserLogin) => {
+export const createSessionService = async (payload: IuserLogin) => {
     const { login, password } = payload;
 
     const userRepo: Repository<User> = AppDataSource.getRepository(User);
@@ -18,7 +19,7 @@ export const createSessionService = async (payload:IuserLogin) => {
     }
 
     const passwordMatch = await compare(password, user.password)
-    
+
 
     if (!passwordMatch) {
         throw new AppError("Invalid credentials", 401);
@@ -31,7 +32,8 @@ export const createSessionService = async (payload:IuserLogin) => {
 
     const token = sign({
         admin: user.admin,
-        id: user.id
+        id: user.id,
+        expiresIn: '10d'
     },
         String(process.env.SECRET_KEY),
         {
@@ -39,5 +41,9 @@ export const createSessionService = async (payload:IuserLogin) => {
         }
     );
 
-    return token;
+    const response = {
+        token,
+        user: userSchemaResponseLogin.parse(user)
+    }
+    return response;
 }

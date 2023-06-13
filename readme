@@ -50,7 +50,7 @@ Para rodar os testes, rode o seguinte comando
 
 
 ## /users post
-```javascript
+```typescript
 //POST
 //SEND OBJ
 REQUEST EXEMPLE {
@@ -100,10 +100,11 @@ RESPONSE EXEMPLE {
 
 ## /login POST
 
-```javascript
+```typescript
 
 REQUEST EXEMPLE {
-
+	"login": "teste@email.com",
+	"password": "teste"
 }
 RESPONSE EXEMPLE {
 	"token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhZG1pbiI6dHJ1ZSwiaWQiOjEsImlhdCI6MTY4NDMzNTQwOSwic3ViIjoiMSJ9.dKJEzmcIs-akJC2ERJYx4K_d9uBoajuOvGE6QK6MrPk"

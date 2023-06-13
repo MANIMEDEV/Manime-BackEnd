@@ -7,8 +7,12 @@ import {
     UpdateDateColumn,
     OneToOne,
     JoinColumn,
+    ManyToMany,
+    JoinTable,
 } from 'typeorm'
 import ProfileInfos from './profileInfos'
+import { Chat } from './chat'
+
 
 @Entity('users')
 class User {
@@ -66,6 +70,10 @@ class User {
     @JoinColumn()
     @OneToOne(()=> ProfileInfos,profileInfos => profileInfos.id)
     profileInfos: ProfileInfos
+
+    @ManyToMany(() => Chat, chat => chat.users)
+    @JoinTable()
+    chats: Chat[];
 
 }
 

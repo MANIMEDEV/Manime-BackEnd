@@ -10,6 +10,9 @@ export const createUserService = async (userPayload: TUserRegister): Promise<TUs
 
     const userRepo: Repository<User> = AppDataSource.getRepository(User);
     const profileInfosRepo: Repository<ProfileInfos> = AppDataSource.getRepository(ProfileInfos);
+    if(userPayload.phone?.trim() == ''){
+        userPayload.phone = null;
+    }
 
     userPayload.password = await hash(userPayload.password,12);
 

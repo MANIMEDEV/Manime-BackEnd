@@ -1,7 +1,7 @@
-import {z} from "zod";
+import { z } from "zod";
 import { profileInfosSchema } from "./profileInfos.schemas";
 
-const userSchema  = z.object({
+const userSchema = z.object({
     id: z.number(),
     fullName: z.string().max(60),
     nickname: z.string().max(20),
@@ -20,26 +20,32 @@ const userSchema  = z.object({
     createdAt: z.string(),
     updatedAt: z.string().nullish(),
     deletedAt: z.string().nullish()
-}); 
+});
 
 const userSchemaRegister = userSchema.omit({
-    updatedAt:true,
-    deletedAt:true,
-    createdAt:true,
-    profileInfos:true,
-    confirmed:true,
-    verified:true,
-    suspendedTime:true,
-    suspended:true,
-    banned:true,
-    id:true
+    updatedAt: true,
+    deletedAt: true,
+    createdAt: true,
+    profileInfos: true,
+    confirmed: true,
+    verified: true,
+    suspendedTime: true,
+    suspended: true,
+    banned: true,
+    id: true
 })
 
 const userSchemaUpdate = userSchemaRegister;
 
 
 const userSchemaResponse = userSchema.omit({
-    password:true,
+    password: true,
+})
+
+
+const userSchemaResponseLogin = userSchema.omit({
+    profileInfos: true,
+    password: true,
 })
 
 const userLoginSchema = z.object({
@@ -52,5 +58,6 @@ export {
     userSchemaRegister,
     userSchemaResponse,
     userSchemaUpdate,
-    userLoginSchema
+    userLoginSchema,
+    userSchemaResponseLogin
 }
