@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { TUserRegister, TUserResponse, TUserUpdate } from "../interfaces/users.interfaces";
 import { createUserService } from "../services/UsersServices/createUser.service";
 import { updateUserService } from "../services/UsersServices/updateUser.service";
-import { getProfileInfosService } from "../services/UsersServices/getProfileInfos.service";
+import { getProfileInfosService, getUserListFollowingService } from "../services/UsersServices/getProfileInfos.service";
 
 const createUserController = async (req: Request, res: Response): Promise<Response> => {
     const userInfos: TUserRegister = req.body;
@@ -19,15 +19,20 @@ const updateUserController = async (req: Request, res: Response): Promise<Respon
 }
 
 const getUserProfileInfosController =  async (_req: Request, res: Response): Promise<Response> => {
-    console.log('CHEGOU NO GET USER');
-    console.log(res.locals.userAuth);
     
     const profileInfos = await getProfileInfosService(res.locals.userAuth.id);
+
+    return res.json(profileInfos).status(200);
+}
+const getUserListFollowingController =  async (_req: Request, res: Response): Promise<Response> => {
+    
+    const profileInfos = await getUserListFollowingService(res.locals.userAuth.id);
 
     return res.json(profileInfos).status(200);
 }
 export {
     createUserController,
     updateUserController,
-    getUserProfileInfosController
+    getUserProfileInfosController,
+    getUserListFollowingController
 }
