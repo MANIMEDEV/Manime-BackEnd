@@ -1,88 +1,66 @@
 import app from './app';
 import { AppDataSource } from './data-source';
 import http from 'http';
-import { Server } from 'socket.io';
-import { Chat } from './entities/chat';
-import { Message } from './entities/messages';
-import User from './entities/user';
+import { Server, Socket } from 'socket.io';
+import { getHistoryChat, sendMessage } from './services/socketServices/socketMessages';
+import "dotenv/config";
+
+interface ISocketUser {
+    userId: number | string | string[],
+    keyToSend: string
+}
 
 (async () => {
     await AppDataSource.initialize().catch((err) => {
         console.error('Error during Data Source initialization', err);
     });
 
+
+    const orginUrl: string | undefined = process.env.Origin_URL;
+
     const httpServer = http.createServer(app);
     const io = new Server(httpServer, {
         cors: {
-            origin: 'http://localhost:5173',
-            methods: ['GET', 'POST'],
+            origin: orginUrl,
+            methods: ['GET', 'POST', 'PATCH', 'DELETE'],
             credentials: true
         }
     });
+    const usersSocketConnect: Array<ISocketUser> = [];
 
-    io.on('connection', (socket) => {
-        console.log(socket.id);
+
+    io.use((socket: Socket, next) => {
+        // Verifique se os dados do usuário estão presentes na query da conexão
+        const userId = socket.handshake.query.userId;
+
+        if (!userId) {
+            // Dados do usuário não estão presentes ou incompletos, recuse a conexão
+            return next(new Error("Usuário não autenticado."));
+        }
+        // Dados do usuário presentes, permita a conexão
+        next();
+    });
+    io.on('connection', (socket: Socket) => {
+        const userId = socket.handshake.query.userId;
+        const exists = usersSocketConnect.find(user => user.userId == userId);
+        if (!exists && userId) {
+            usersSocketConnect.push({ userId: userId, keyToSend: socket.id })
+
+        } else {
+            exists!.keyToSend = socket.id;
+        }
+        console.log(usersSocketConnect, "users");
+        
         socket.on('conectChat', (ChatData) => {
-            
-            console.log('log join',ChatData);
-            
+
             socket.join(ChatData);
             socket.on('getHistoryChat', async (data) => {
-                
-                let chat = await AppDataSource.getRepository(Chat).createQueryBuilder('chat')
-                .leftJoinAndSelect('chat.messages', 'messages')
-                .where('chat.roomId = :id', { id: String(data.chatId) }).orderBy('messages.timestamp', 'ASC')
-                .getOne();
-                
-                const messages = chat?.messages;
-                
-                console.log(messages);
-
-                socket.emit("setHistoryChat",messages)
+                getHistoryChat(data, socket);
             })
 
         });
         socket.on('sendMessage', async (data) => {
-            const { senderId, userReceived, content, roomId } = data;
-            const chatId = roomId;
-            const message = new Message();
-            message.senderId = senderId;
-            message.content = content;
-            message.timestamp = new Date();
-            console.log('DATA => ',data);
-            
-            try {
-                let chat = await AppDataSource.getRepository(Chat).createQueryBuilder('chat')
-                .leftJoinAndSelect('chat.messages', 'messages')
-                .where('chat.roomId = :id', { id: String(data.roomId) })
-                .getOne();
-                
-                if (!chat) {
-                    chat = new Chat();
-                    chat.roomId = chatId;
-                    chat.messages = [];
-                }
-                if(!chat.messages){
-                    chat.messages = [];
-                }
-
-                chat.messages.push(message);
-
-                // Associar tanto o remetente quanto o destinatário ao chat
-                const senderUser = await AppDataSource.getRepository(User).findOneBy({id:senderId});
-                const receiverUser = await AppDataSource.getRepository(User).findOneBy({id: userReceived});
-                if (senderUser && receiverUser) {
-                    chat.users = [senderUser, receiverUser];
-                }
-
-                await AppDataSource.getRepository(Chat).save(chat);
-
-                console.log('Chat salvo:');
-                console.log('Chat chatId:', chatId);
-                socket.in(chatId).emit('receiveMessage',message)
-            } catch (error) {
-                console.error('Erro ao salvar o chat:', error);
-            }
+            await sendMessage(data, socket, usersSocketConnect);
         });
 
     });
