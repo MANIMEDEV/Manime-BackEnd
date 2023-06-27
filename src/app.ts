@@ -5,12 +5,13 @@ import "express-async-errors";
 import loginRouter from "./routes/login.router";
 import cors from 'cors'
 import chatRouter from "./routes/chat.router";
-
+import "dotenv/config";
 
 const app = express();
+const orginUrl: string | undefined = process.env.Origin_URL;
 app.use(express.json());
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: orginUrl,
     credentials: true
 }));
 
