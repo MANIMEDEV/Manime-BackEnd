@@ -3,7 +3,7 @@ import { AppDataSource } from '../data-source';
 import User from '../entities/user';
 
 export async function getChats(req: Request, res: Response) {
-    const userId = req.params.userId;
+    const userId = req.params.userId ;
 
     try {
         const user = await AppDataSource.getRepository(User)

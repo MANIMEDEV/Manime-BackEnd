@@ -32,6 +32,7 @@ interface ISocketUser {
     io.use((socket: Socket, next) => {
         // Verifique se os dados do usuário estão presentes na query da conexão
         const userId = socket.handshake.query.userId;
+    
 
         if (!userId) {
             // Dados do usuário não estão presentes ou incompletos, recuse a conexão

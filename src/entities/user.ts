@@ -75,11 +75,11 @@ class User {
     @JoinTable()
     chats: Chat[];
 
-    @ManyToMany(() => User, (user) => user.following)
+    @ManyToMany(() => User, (user) => user.followers)
     @JoinTable()
     followers: User[];
 
-    @ManyToMany(() => User, (user) => user.followers)
+    @ManyToMany(() => User, (user) => user.following)
     @JoinTable()
     following: User[];
 

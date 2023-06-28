@@ -5,10 +5,13 @@ import { AppDataSource } from "../../data-source"
 import { Chat } from "../../entities/chat"
 
 export const sendMessageNotification = (socket: Socket, chatId: string, sendUser: User, goTo: string) => {
+
+    if (!goTo) {
+        return "error user not found"
+    }
     if (!sendUser) {
         return "error user not found"
     }
-
     socket.to(goTo).emit("newMessageNotify", {
         chatId,
     })
@@ -45,37 +48,67 @@ export const sendMessage = async (data: any, socket: Socket, usersSocketConnect:
             .where('chat.roomId = :id', { id: String(data.roomId) })
             .getOne();
 
-        if (!chat) {
+        if (chat == null || !chat) {
             chat = new Chat();
             chat.roomId = chatId;
             chat.messages = [];
+            await AppDataSource.getRepository(Chat).save(chat);
         }
+
+
         if (!chat.messages) {
             chat.messages = [];
         }
-
         chat.messages.push(message);
 
-        // Associar tanto o remetente quanto o destinatário ao chat
-        const senderUser = await AppDataSource.getRepository(User).findOneBy({ id: senderId });
-        const receiverUser = await AppDataSource.getRepository(User).findOneBy({ id: userReceived });
-        if (senderUser && receiverUser) {
-            chat.users = [senderUser, receiverUser];
+        let senderUser = await AppDataSource.getRepository(User)
+            .createQueryBuilder('user')
+            .innerJoinAndSelect('user.chats', 'chats')
+            .where('user.id = :userId', { userId: senderId })
+            .getOne();
+
+
+        let receiverUser = await AppDataSource.getRepository(User)
+            .createQueryBuilder('user')
+            .innerJoinAndSelect('user.chats', 'chats')
+            .where('user.id = :userId', { userId: userReceived })
+            .getOne();
+
+
+        if (!senderUser) {
+            senderUser = await AppDataSource.getRepository(User).findOneBy({ id: senderId });
+        }
+        if (!receiverUser) {
+            receiverUser = await AppDataSource.getRepository(User).findOneBy({ id: userReceived });
         }
 
-
+        if (senderUser && receiverUser) {
+            if(!senderUser.chats){
+                senderUser.chats = []
+            }
+            if(!receiverUser.chats){
+                receiverUser.chats = []
+            }
+            senderUser.chats.push(chat);
+            receiverUser.chats.push(chat);
+            await AppDataSource.getRepository(User).save(senderUser);
+            await AppDataSource.getRepository(User).save(receiverUser);
+            chat.users = [senderUser, receiverUser];
+        }
         await AppDataSource.getRepository(Chat).save(chat);
 
 
         const keyReceives = usersSocketConnect.find(user => user.userId == receiverUser?.id)
-        sendMessageNotification(socket, chatId, senderUser!, keyReceives.keyToSend)
+        if (keyReceives) {
+            sendMessageNotification(socket, chatId, senderUser!, keyReceives.keyToSend)
+        }
         socket.in(chatId).emit('receiveMessage', message)
     } catch (error) {
         console.error('Erro ao salvar o chat:', error);
     }
 }
 
-export const getHistoryChat = async (data: any,socket: Socket) => {
+export const getHistoryChat = async (data: any, socket: Socket) => {
 
     let chat = await AppDataSource.getRepository(Chat).createQueryBuilder('chat')
         .leftJoinAndSelect('chat.messages', 'messages')

@@ -9,4 +9,13 @@ export interface IuserLogin{
     login:string,
     password: string
 }
+
+export interface IBaseUser {
+    id: number | string,
+    nickname: string;
+    profileImg: string;
+}
+
+
+
 export type TUserUpdate = DeepPartial<z.infer<typeof userSchemaUpdate>>

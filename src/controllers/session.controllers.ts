@@ -12,21 +12,18 @@ const createSessionController = async (req: Request, res: Response): Promise<Res
 
 const retrivieveUserController = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
 
+    
     const authorization: string | undefined = req.headers.authorization;
-
+    
     if (authorization == undefined) {
         throw new AppError('Missing bearer token', 401);
     }
     const [_bearer, token] = authorization.split(' ');
-
-
-    const decoded = await retrivieveUserService(token);
-
-
     
-
+    
+    const decoded = await retrivieveUserService(token);
+    
     res.locals.userAuth = decoded;
-
     
     return next();
 }
