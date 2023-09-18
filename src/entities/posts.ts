@@ -7,9 +7,11 @@ import {
     DeleteDateColumn,
     Column,
     JoinColumn,
-    OneToOne,
+    ManyToOne,
+    OneToMany,
 } from 'typeorm'
 import User from './user';
+import Likes from './likes';
 
 @Entity('posts')
 class Posts {
@@ -23,14 +25,21 @@ class Posts {
     description: string | null
 
     @Column({type: 'text', nullable: true})
-    imgS: string | null
+    imgs: string | null
 
     @Column({type:'integer', default: 0})
-    likes: number
+    numLikes: number
+
+    @Column({type:'integer', default: 0})
+    numComments: number
 
     @JoinColumn()
-    @OneToOne(()=> User, user => user.id)
+    @ManyToOne(()=> User, user => user.id)
     user: User
+
+    @JoinColumn()
+    @OneToMany(()=> Likes, like => like.post)
+    likes: Likes[];
 
     @CreateDateColumn({ type: 'date' })
     createdAt: string

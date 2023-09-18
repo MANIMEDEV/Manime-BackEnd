@@ -53,11 +53,23 @@ const userLoginSchema = z.object({
     password: z.string()
 });
 
+const userBaseResponse = z.object({
+    id: z.number(),
+    fullName: z.string().max(60),
+    nickname: z.string().max(20),
+    phone: z.string().max(20).optional().nullable(),
+    profileImg: z.string().default(''),
+    bannerImg: z.string().default(''),
+    banned: z.boolean().default(false).optional(),
+    verified: z.boolean().default(false).optional()
+})
+
 export {
     userSchema,
     userSchemaRegister,
     userSchemaResponse,
     userSchemaUpdate,
     userLoginSchema,
-    userSchemaResponseLogin
+    userSchemaResponseLogin,
+    userBaseResponse
 }

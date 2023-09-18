@@ -21,20 +21,20 @@ class User {
 
     @Column({ type: 'varchar', length: 60 })
     fullName: string
-        
-    @Column({type: 'varchar',length: 20, unique:true})
+
+    @Column({ type: 'varchar', length: 20, unique: true })
     nickname: string
 
     @Column({ type: 'varchar', length: 45, unique: true })
     email: string
 
-    @Column({type: 'varchar',length: 20, unique:true, nullable: true})
+    @Column({ type: 'varchar', length: 20, unique: true, nullable: true })
     phone: string | null
 
-    @Column({type: 'text', default:'' })
+    @Column({ type: 'text', default: '' })
     profileImg: string
 
-    @Column({type: 'text', default:'' })
+    @Column({ type: 'text', default: '' })
     bannerImg: string
 
     @Column({ type: 'boolean', default: false })
@@ -43,16 +43,16 @@ class User {
     @Column({ type: 'boolean', default: false })
     suspended: boolean
 
-    @Column({ type: 'time', nullable: true})
+    @Column({ type: 'time', nullable: true })
     suspendedTime: number | Date | null
 
     @Column({ type: 'boolean', default: false })
     admin: boolean
 
-    @Column({type: 'boolean', default: false})
+    @Column({ type: 'boolean', default: false })
     verified: boolean // usuario verificado como perfil oficial
 
-    @Column({type: 'boolean', default: false})
+    @Column({ type: 'boolean', default: false })
     confirmed: boolean // quando o usuario confirma o dado de email!
 
     @Column({ type: 'varchar', length: 120 })
@@ -68,12 +68,34 @@ class User {
     deletedAt: string
 
     @JoinColumn()
-    @OneToOne(()=> ProfileInfos,profileInfos => profileInfos.id)
+    @OneToOne(() => ProfileInfos, profileInfos => profileInfos.id)
     profileInfos: ProfileInfos
 
     @ManyToMany(() => Chat, chat => chat.users)
     @JoinTable()
     chats: Chat[];
+
+    @ManyToMany(() => User, (user) => user.followers)
+    @JoinTable()
+    followers: User[];
+
+    @ManyToMany(() => User, (user) => user.following)
+    @JoinTable()
+    following: User[];
+
+    follow(user: User): void {
+        if (!this.following) {
+            this.following = [];
+        }
+
+        this.following.push(user);
+    }
+
+    unfollow(user: User): void {
+        if (this.following) {
+            this.following = this.following.filter((u) => u.id !== user.id);
+        }
+    }
 
 }
 
