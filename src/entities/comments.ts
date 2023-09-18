@@ -15,21 +15,24 @@ class Comments {
     @PrimaryGeneratedColumn('increment')
     id: number
 
-    @Column({type: 'varchar',length: 255})
+    @Column({ type: 'varchar', nullable: true, length: 255 })
     description: string
 
+    @Column({ type: 'varchar', array: true })
+    images: string[]
+
     @JoinColumn()
-    @OneToOne(()=> User, user => user.id)
+    @OneToOne(() => User, user => user.id)
     user: User
-    
+
     @JoinColumn()
-    @OneToOne(()=> Posts, posts => posts.id)
+    @OneToOne(() => Posts, posts => posts.id)
     post: Posts
 
     @CreateDateColumn({ type: 'date' })
     createdAt: string
 
-    @DeleteDateColumn({type: 'date'})
+    @DeleteDateColumn({ type: 'date' })
     deletedAt: string
 }
 

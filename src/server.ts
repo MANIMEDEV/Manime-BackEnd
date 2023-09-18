@@ -2,7 +2,7 @@ import app from './app';
 import { AppDataSource } from './data-source';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
-import { getHistoryChat, sendMessage } from './services/socketServices/socketMessages';
+import { getHistoryChat, sendGenericNotification, sendMessage } from './services/socketServices/socketMessages';
 import "dotenv/config";
 
 interface ISocketUser {
@@ -27,8 +27,6 @@ interface ISocketUser {
         }
     });
     const usersSocketConnect: Array<ISocketUser> = [];
-
-
     io.use((socket: Socket, next) => {
         // Verifique se os dados do usuário estão presentes na query da conexão
         const userId = socket.handshake.query.userId;
@@ -50,8 +48,6 @@ interface ISocketUser {
         } else {
             exists!.keyToSend = socket.id;
         }
-        console.log(usersSocketConnect, "users");
-        
         socket.on('conectChat', (ChatData) => {
 
             socket.join(ChatData);
@@ -63,8 +59,16 @@ interface ISocketUser {
         socket.on('sendMessage', async (data) => {
             await sendMessage(data, socket, usersSocketConnect);
         });
-
+        socket.on('newFollow', async (data) => {
+            const keyReceives = usersSocketConnect.find(user => user.userId == data.receiverUserId);
+            await sendGenericNotification(socket,data.sendUser,keyReceives!.keyToSend,"Começou a seguir você <3");
+        });
+        socket.on('newLikeInPublication', async (data) => {
+            const keyReceives = usersSocketConnect.find(user => user.userId == data.receiverUserId);
+            await sendGenericNotification(socket,data.sendUser,keyReceives!.keyToSend,"meu krlh");
+        });
     });
+    
 
     const port = process.env.PORT || 3000;
     httpServer.listen(port, () => {

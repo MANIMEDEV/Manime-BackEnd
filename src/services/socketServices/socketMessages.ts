@@ -3,7 +3,8 @@ import User from "../../entities/user"
 import { Message } from "../../entities/messages"
 import { AppDataSource } from "../../data-source"
 import { Chat } from "../../entities/chat"
-
+import { IBaseUser } from "../../interfaces/users.interfaces"
+// import * as fs from 'fs'
 export const sendMessageNotification = (socket: Socket, chatId: string, sendUser: User, goTo: string) => {
 
     if (!goTo) {
@@ -18,13 +19,13 @@ export const sendMessageNotification = (socket: Socket, chatId: string, sendUser
 }
 
 
-export const sendGenericNotification = (socket: Socket, _chatId: string, sendUser: User | null, goTo: string) => {
+export const sendGenericNotification = async (socket: Socket, sendUser: IBaseUser, goTo: string,notifyMessage: string) => {
     if (!sendUser) {
         return "error user not found"
     }
 
     socket.to(goTo).emit("newGenericNotify", {
-        message: "curtiu seu post!",
+        message: notifyMessage,
         sendUserInfos: {
             name: sendUser.nickname,
             profileImg: sendUser.profileImg,
@@ -33,7 +34,6 @@ export const sendGenericNotification = (socket: Socket, _chatId: string, sendUse
     })
 }
 
-
 export const sendMessage = async (data: any, socket: Socket, usersSocketConnect: Array<any>) => {
     const { senderId, userReceived, content, roomId } = data;
     const chatId = roomId;
@@ -41,6 +41,7 @@ export const sendMessage = async (data: any, socket: Socket, usersSocketConnect:
     message.senderId = senderId;
     message.content = content;
     message.timestamp = new Date();
+
 
     try {
         let chat = await AppDataSource.getRepository(Chat).createQueryBuilder('chat')

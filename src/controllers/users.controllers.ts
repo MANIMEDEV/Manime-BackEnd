@@ -3,7 +3,7 @@ import { TUserRegister, TUserResponse, TUserUpdate } from "../interfaces/users.i
 import { createUserService } from "../services/UsersServices/createUser.service";
 import { updateUserService } from "../services/UsersServices/updateUser.service";
 import { getProfileInfosService, getUserListFollowingService } from "../services/UsersServices/getProfileInfos.service";
-import { followUser, getMutualFollowers } from "../services/UsersServices/follow.service";
+import { followUser, getAllUsersService, getMutualFollowers } from "../services/UsersServices/follow.service";
 
 const createUserController = async (req: Request, res: Response): Promise<Response> => {
     const userInfos: TUserRegister = req.body;
@@ -39,6 +39,16 @@ const getUserListMutualFollowersController =  async (_req: Request, res: Respons
 
     return res.json(mutualFollowers).status(200);
 }
+const getAllUsersController =  async (req: Request, res: Response): Promise<Response> => {  
+    let filter = req.query.name;
+    if(!filter){
+        filter = ''
+    }
+    const allUsers = await getAllUsersService(filter.toString());
+
+    return res.json(allUsers).status(200);
+}
+
 const createFollowUser =  async (req: Request, res: Response): Promise<Response> => {
     
     const follow = await followUser(res.locals.userAuth.id, Number(req.params.followId));
@@ -51,5 +61,6 @@ export {
     getUserProfileInfosController,
     getUserListFollowingController,
     getUserListMutualFollowersController,
-    createFollowUser
+    createFollowUser,
+    getAllUsersController
 }
