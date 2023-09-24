@@ -9,9 +9,11 @@ import {
     JoinColumn,
     ManyToMany,
     JoinTable,
+    OneToMany,
 } from 'typeorm'
 import ProfileInfos from './profileInfos'
 import { Chat } from './chat'
+import Likes from './likes'
 
 
 @Entity('users')
@@ -66,6 +68,10 @@ class User {
 
     @DeleteDateColumn({ type: 'date' })
     deletedAt: string
+
+    @JoinColumn()
+    @OneToMany(() => Likes, like => like.user)
+    likes: Likes[];
 
     @JoinColumn()
     @OneToOne(() => ProfileInfos, profileInfos => profileInfos.id)
